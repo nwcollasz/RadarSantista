@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using Dapper;
 using RadarSantista.ConsoleApp.Models;
@@ -52,11 +54,31 @@ namespace RadarSantista.ConsoleApp.Repositories
 
             using var connection = new SqliteConnection(_connectionString);
             
-            string query = @"
+            string queryUltimoStatus = @"
+                SELECT Terminal, Carga, Descarga, Embarque, Status 
+                FROM HistoricoAtracados 
+                WHERE Nome = @Nome 
+                ORDER BY Id DESC 
+                LIMIT 1;";
+
+            string queryInsert = @"
                 INSERT INTO HistoricoAtracados (Nome, Terminal, Carga, Descarga, Embarque, Status, DataRegistro)
                 VALUES (@Nome, @Terminal, @Carga, @Descarga, @Embarque, @Status, @DataRegistro);";
 
-            connection.Execute(query, navios);
+            foreach (var navio in navios)
+            {
+                var ultimoRegistro = connection.QueryFirstOrDefault<Navio>(queryUltimoStatus, new { Nome = navio.Nome });
+
+                if (ultimoRegistro == null || 
+                    ultimoRegistro.Terminal != navio.Terminal || 
+                    ultimoRegistro.Carga != navio.Carga || 
+                    ultimoRegistro.Descarga != navio.Descarga || 
+                    ultimoRegistro.Embarque != navio.Embarque || 
+                    ultimoRegistro.Status != navio.Status)
+                {
+                    connection.Execute(queryInsert, navio);
+                }
+            }
         }
 
         public void SalvarProgramados(List<Navio> navios)
@@ -65,11 +87,30 @@ namespace RadarSantista.ConsoleApp.Repositories
 
             using var connection = new SqliteConnection(_connectionString);
             
-            string query = @"
+            string queryUltimoStatus = @"
+                SELECT Terminal, Evento, Status, DataPrevisao 
+                FROM HistoricoProgramados 
+                WHERE Nome = @Nome 
+                ORDER BY Id DESC 
+                LIMIT 1;";
+
+            string queryInsert = @"
                 INSERT INTO HistoricoProgramados (Nome, Imo, Terminal, Evento, Status, DataPrevisao, DataRegistro)
                 VALUES (@Nome, @Imo, @Terminal, @Evento, @Status, @DataPrevisao, @DataRegistro);";
 
-            connection.Execute(query, navios);
+            foreach (var navio in navios)
+            {
+                var ultimoRegistro = connection.QueryFirstOrDefault<Navio>(queryUltimoStatus, new { Nome = navio.Nome });
+
+                if (ultimoRegistro == null || 
+                    ultimoRegistro.Terminal != navio.Terminal || 
+                    ultimoRegistro.Evento != navio.Evento || 
+                    ultimoRegistro.Status != navio.Status || 
+                    ultimoRegistro.DataPrevisao != navio.DataPrevisao)
+                {
+                    connection.Execute(queryInsert, navio);
+                }
+            }
         }
     }
 }
