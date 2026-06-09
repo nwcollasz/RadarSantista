@@ -11,5 +11,6 @@ namespace RadarSantista.ConsoleApp.Models
         public DateTime? DataPrevisao { get; set; }
         public string Descarga { get; set; } = "0";
         public string Embarque { get; set; } = "0";
+        public DateTime DataRegistro { get; set; } = DateTime.Now;
     }
 }
