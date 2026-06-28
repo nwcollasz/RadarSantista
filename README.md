@@ -1,17 +1,20 @@
 # RadarSantista — Monitoramento Portuário 🚢
 
-Um sistema autônomo de raspagem de dados (Web Scraper) desenvolvido para monitorar o fluxo de navios atracados e programados no Porto de Santos.
+Um sistema autônomo web scraper desenvolvido para monitorar o fluxo de navios atracados e programados no site do Porto de Santos.
 
 ## O que o sistema faz
 
-* **Coleta Autônoma:** Realiza a varredura cíclica de portais da web, extraindo dados brutos sobre a movimentação dos navios.
-* **Tratamento de Dados:** Converte informações textuais não estruturadas da internet em dados limpos e organizados.
-* **Filtro de Mudança de Estado:** Compara as informações capturadas com o último registro salvo no banco de dados. O sistema só efetua um novo `INSERT` se o navio sofrer alguma alteração real (como mudança de status, terminal ou carga).
-* **Histórico por Eventos:** Gera uma linha do tempo enxuta da atividade portuária, armazenando apenas as movimentações relevantes e eliminando registros duplicados.
+- Web scraping contínuo: Um script roda periodicamente monitorando os portais web para extrair os dados brutos dos navios.
 
-## Tecnologias Utilizadas
+- Parsing: Transforma os textos não estruturados coletados da internet em dados limpos e padronizados.
 
-* **Linguagem:** C# / .NET 10
-* **Banco de Dados:** SQLite
-* **Acesso a Dados:** Dapper (Micro-ORM)
-* **Extração de Dados:** HtmlAgilityPack
+- Filtro de mudança de estado: Compara os dados capturados com o último registro do banco. Só faz um novo INSERT se houver alteração real de status, terminal ou carga, evitando escrita redundante.
+
+- Histórico por eventos: Gera uma linha do tempo da atividade portuária, salvando apenas eventos relevantes e descartando duplicatas.
+
+## Tecnologias
+
+*  C# / .NET 10
+* Banco de Dados: SQLite
+* Acesso a Dados: Dapper (Micro-ORM)
+* Extração de Dados: HtmlAgilityPack
