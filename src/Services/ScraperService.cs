@@ -1,21 +1,21 @@
-using System.Globalization;
 using HtmlAgilityPack;
-using RadarSantista.ConsoleApp.Models;
-using RadarSantista.ConsoleApp.Utils;
+using RadarSantista.src.Models;
 
-namespace RadarSantista.ConsoleApp.Services
+namespace RadarSantista.src.Services
 {
-    public class ScraperService
+    public class ScraperService : INavioDataSource
     {
         private readonly HttpClient _client;
+        private readonly NavioNormalizer _normalizer;
         private const int MAX_TENTATIVAS = 3;
 
         public ScraperService(HttpClient client)
         {
             _client = client;
+            _normalizer = new NavioNormalizer();
         }
 
-        public async Task<List<Navio>> ObterAtracados()
+        public async Task<IReadOnlyList<Navio>> ObterAtracadosAsync(CancellationToken cancellationToken = default)
 {
     var resultado = new List<Navio>();
     string url = "https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracados-porto-terminais/";
@@ -38,15 +38,15 @@ namespace RadarSantista.ConsoleApp.Services
             var colunas = linha.SelectNodes(".//td");
             if (colunas != null && colunas.Count >= 9)
             {
-                string localBruto = TextHelper.Limpar(colunas[0].InnerText);
-                string nomeNavio = TextHelper.Limpar(colunas[1].InnerText);
-                string carga = TextHelper.Limpar(colunas[6].InnerText);
-                string descarga = TextHelper.Limpar(colunas[7].InnerText);
-                string embarque = TextHelper.Limpar(colunas[8].InnerText);
+                string localBruto = _normalizer.NormalizarTexto(colunas[0].InnerText);
+                string nomeNavio = _normalizer.NormalizarTexto(colunas[1].InnerText);
+                string carga = _normalizer.NormalizarTexto(colunas[6].InnerText);
+                string descarga = _normalizer.NormalizarTexto(colunas[7].InnerText);
+                string embarque = _normalizer.NormalizarTexto(colunas[8].InnerText);
 
                 if (localBruto.Contains("LOCAL") || nomeNavio.Contains("SHIP")) 
                     continue;
-                if (string.IsNullOrEmpty(nomeNavio))
+                if (string.IsNullOrWhiteSpace(nomeNavio))
                     continue;
                 if (!string.IsNullOrEmpty(localBruto))
                 {
@@ -57,22 +57,14 @@ namespace RadarSantista.ConsoleApp.Services
                     localBruto = ultimoTerminalValido;
                 }
 
-                resultado.Add(new Navio 
-                {
-                    Nome = nomeNavio, 
-                    Terminal = localBruto,
-                    Carga = carga, 
-                    Descarga = descarga, 
-                    Embarque = embarque, 
-                    Status = "OPERANDO"
-                });
+                resultado.Add(_normalizer.NormalizarAtracado(nomeNavio, localBruto, carga, descarga, embarque));
             }
         }
     }
     return resultado;
 }
 
-        public async Task<List<Navio>> ObterProgramados()
+        public async Task<IReadOnlyList<Navio>> ObterProgramadosAsync(CancellationToken cancellationToken = default)
         {
             var resultado = new List<Navio>();
             string url = "https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracacoes-programadas/";
@@ -94,28 +86,20 @@ namespace RadarSantista.ConsoleApp.Services
                     var colunas = linha.SelectNodes(".//td");
                     if (colunas != null && colunas.Count >= 8)
                     {
-                        string dataStr = TextHelper.Limpar(colunas[0].InnerText);
-                        string horaStrRaw = TextHelper.Limpar(colunas[1].InnerText); 
-                        string local = TextHelper.Limpar(colunas[3].InnerText);    
-                        string nomeNavio = TextHelper.Limpar(colunas[4].InnerText);    
-                        string imo = TextHelper.Limpar(colunas[5].InnerText);      
-                        string evento = TextHelper.Limpar(colunas[7].InnerText);   
+                        string dataStr = _normalizer.NormalizarTexto(colunas[0].InnerText);
+                        string horaStrRaw = _normalizer.NormalizarTexto(colunas[1].InnerText); 
+                        string local = _normalizer.NormalizarTexto(colunas[3].InnerText);    
+                        string nomeNavio = _normalizer.NormalizarTexto(colunas[4].InnerText);    
+                        string imo = _normalizer.NormalizarTexto(colunas[5].InnerText);      
+                        string evento = _normalizer.NormalizarTexto(colunas[7].InnerText);   
 
-                        if (dataStr.Contains("DATA") || string.IsNullOrEmpty(nomeNavio) || nomeNavio.Contains("SHIP")) 
+                        if (dataStr.Contains("DATA") || string.IsNullOrWhiteSpace(nomeNavio) || nomeNavio.Contains("SHIP")) 
                             continue;
 
-                        string horaStr = horaStrRaw.Split('/')[0].Trim();
-                        string dataComAno = dataStr.Length <= 5 ? $"{dataStr}/{agora.Year}" : dataStr;
-
-                        if (DateTime.TryParseExact($"{dataComAno} {horaStr}", new[] { "dd/MM/yyyy HH:mm", "dd/MM/yy HH:mm" }, 
-                            CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dataProgramada))
+                        var navioProgramado = _normalizer.NormalizarProgramado(dataStr, horaStrRaw, local, nomeNavio, imo, evento, agora);
+                        if (navioProgramado != null)
                         {
-                            if (dataProgramada.Date < agora.Date) continue;
-
-                            resultado.Add(new Navio 
-                            {
-                                Nome = nomeNavio, Imo = imo, Terminal = local, Evento = evento, DataPrevisao = dataProgramada, Status = "PROGRAMADO"
-                            });
+                            resultado.Add(navioProgramado);
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-namespace RadarSantista.ConsoleApp.Models
+namespace RadarSantista.src.Models
 {
     public class Navio
     {

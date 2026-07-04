@@ -1,6 +1,6 @@
-using RadarSantista.ConsoleApp.Models;
+using RadarSantista.src.Models;
 
-namespace RadarSantista.ConsoleApp.Services
+namespace RadarSantista.src.Services
 {
     public static class ConsoleVisualService
     {
