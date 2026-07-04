@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Net;
 
-namespace RadarSantista.ConsoleApp.Utils
+namespace RadarSantista.src.Utils
 {
     public static class TextHelper
     {
