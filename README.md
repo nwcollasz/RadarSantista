@@ -2,19 +2,22 @@
 
 Um sistema autônomo web scraper desenvolvido para monitorar o fluxo de navios atracados e programados no site do Porto de Santos.
 
+É um projeto para fins de estudo, com o objetivo de praticar arquitetura de software e tratamento de dados em C#.
+
 ## O que o sistema faz
 
-- Web scraping contínuo: Um script roda periodicamente monitorando os portais web para extrair os dados brutos dos navios.
+- Web scraping: Um script roda de tempos em tempos monitorando os portais do porto para extrair os dados brutos dos navios.
 
-- Parsing: Transforma os textos não estruturados coletados da internet em dados limpos e padronizados.
+- Parsing: Trata textos zoados e remove espaços invisíveis ou quebras de linha do HTML.
 
-- Filtro de mudança de estado: Compara os dados capturados com o último registro do banco. Só faz um novo INSERT se houver alteração real de status, terminal ou carga, evitando escrita redundante.
+- Filtro de mudança de estado: Usa snapshots na memória para checar se o navio mudou de verdade de estado. Se o dado for repetido, o sistema ignora e não polui o banco.
 
-- Histórico por eventos: Gera uma linha do tempo da atividade portuária, salvando apenas eventos relevantes e descartando duplicatas.
+- Histórico por eventos: Cria uma linha do tempo de toda a atividade dos navios.
 
-## Tecnologias
+## O que foi utilizado
 
 *  C# / .NET 10
-* Banco de Dados: SQLite
-* Acesso a Dados: Dapper (Micro-ORM)
-* Extração de Dados: HtmlAgilityPack
+*  SQL Server LocalDB
+*  Dapper
+*  HtmlAgilityPack
+*  xUnit
