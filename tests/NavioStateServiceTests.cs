@@ -5,7 +5,7 @@ namespace RadarSantista.Tests;
 
 public class NavioStateServiceTests
 {
-    private readonly NavioStateService _service = new();
+    private readonly EstadoNavio _service = new();
 
     [Fact]
     public void DevePersistirAtracado_WhenNaoHaUltimoRegistro()
@@ -60,5 +60,25 @@ public class NavioStateServiceTests
         Assert.Equal("NAVIO", snapshot.Nome);
         Assert.Equal("T1", snapshot.Terminal);
         Assert.Equal("OPERANDO", snapshot.Status);
+    }
+
+    [Fact]
+    public void ObterChaveNegocio_DeveUsarImoQuandoDisponivel()
+    {
+        var navio = new Navio { Nome = "Navio Exemplo", Imo = "1234567" };
+
+        var chave = navio.ObterChaveNegocio();
+
+        Assert.Equal("1234567", chave);
+    }
+
+    [Fact]
+    public void ObterChaveNegocio_DeveUsarNomeQuandoImoNaoDisponivel()
+    {
+        var navio = new Navio { Nome = "Navio Exemplo", Imo = string.Empty };
+
+        var chave = navio.ObterChaveNegocio();
+
+        Assert.Equal("Navio Exemplo", chave);
     }
 }
