@@ -12,5 +12,16 @@ namespace RadarSantista.src.Models
         public string Descarga { get; set; } = "0";
         public string Embarque { get; set; } = "0";
         public DateTime DataRegistro { get; set; } = DateTime.Now;
+
+        public string ObterChaveNegocio()
+        {
+            var imo = (Imo ?? string.Empty).Trim();
+            if (!string.IsNullOrWhiteSpace(imo))
+            {
+                return imo;
+            }
+
+            return (Nome ?? string.Empty).Trim();
+        }
     }
 }
