@@ -3,7 +3,7 @@ using RadarSantista.src.Utils;
 
 namespace RadarSantista.src.Services
 {
-    public class NavioNormalizer
+    public class Normalizador
     {
         public Navio NormalizarAtracado(string nome, string terminal, string carga, string descarga, string embarque)
         {
