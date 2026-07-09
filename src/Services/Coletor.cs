@@ -3,16 +3,16 @@ using RadarSantista.src.Models;
 
 namespace RadarSantista.src.Services
 {
-    public class ScraperService : INavioDataSource
+    public class Coletor : INavioDataSource
     {
         private readonly HttpClient _client;
-        private readonly NavioNormalizer _normalizer;
+        private readonly Normalizador _normalizer;
         private const int MAX_TENTATIVAS = 3;
 
-        public ScraperService(HttpClient client)
+        public Coletor(HttpClient client)
         {
             _client = client;
-            _normalizer = new NavioNormalizer();
+            _normalizer = new Normalizador();
         }
 
         public async Task<IReadOnlyList<Navio>> ObterAtracadosAsync(CancellationToken cancellationToken = default)
@@ -107,7 +107,7 @@ namespace RadarSantista.src.Services
             return resultado;
         }
 
-        private async Task<HtmlDocument> BaixarHtmlComRetry(string url)
+        private async Task<HtmlDocument?> BaixarHtmlComRetry(string url)
         {
             for (int tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++)
             {
@@ -120,10 +120,15 @@ namespace RadarSantista.src.Services
                 }
                 catch
                 {
-                    if (tentativa == MAX_TENTATIVAS) return null;
+                    if (tentativa == MAX_TENTATIVAS)
+                    {
+                        return null;
+                    }
+
                     await Task.Delay(TimeSpan.FromSeconds(2));
                 }
             }
+
             return null;
         }
     }

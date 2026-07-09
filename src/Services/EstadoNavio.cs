@@ -2,7 +2,7 @@ using RadarSantista.src.Models;
 
 namespace RadarSantista.src.Services
 {
-    public class NavioStateService
+    public class EstadoNavio
     {
         public bool DevePersistirAtracado(Navio novoNavio, Navio? ultimoRegistro)
         {

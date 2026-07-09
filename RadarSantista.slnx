@@ -1,5 +1,5 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/RadarSantista.ConsoleApp/RadarSantista.ConsoleApp.csproj" />
+    <Project Path="src/RadarSantista.csproj" />
   </Folder>
 </Solution>

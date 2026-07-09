@@ -7,13 +7,16 @@ namespace RadarSantista.src
     {
         public static async Task Main(string[] args)
         {
-            var httpClient = SetupHttpClient();
-            INavioRepository navioRepository = new DatabaseRepository();
-            var scraperService = new ScraperService(httpClient);
-            var consoleOutput = new ConsoleOutput();
-            var monitoringService = new MonitoringService(navioRepository, scraperService, consoleOutput);
+            var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=RadarSantista;Trusted_Connection=True;TrustServerCertificate=True;";
+            var inicializador = new InicializadorBanco(connectionString);
+            inicializador.Initialize();
 
-            await monitoringService.RunAsync();
+            var httpClient = SetupHttpClient();
+            INavioRepository navioRepository = new Repositorio(connectionString);
+            var scraper = new Coletor(httpClient);
+            var monitor = new Monitorador(navioRepository, scraper);
+
+            await monitor.RunAsync();
         }
 
         private static HttpClient SetupHttpClient()
