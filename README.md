@@ -1,4 +1,4 @@
-# RadarSantista — Monitoramento Portuário 🚢
+# radarSantista — Monitoramento Portuário
 
 Um sistema autônomo web scraper desenvolvido para monitorar o fluxo de navios atracados e programados no site do Porto de Santos.
 
